@@ -12,6 +12,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -43,7 +50,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION))
             initMap();
 
-        NfcAdapter.getDefaultAdapter(this).setNdefPushMessageCallback(new Beamer(), this);
+        createDogList();
+    }
+
+    private void createDogList() {
+        LinearLayout dogLayout = (LinearLayout) findViewById(R.id.dog_list);
+        LinearLayout angusLayout = createDogLayout(DogSeeder.getAngus());
+        LinearLayout kiraLayout = createDogLayout(DogSeeder.getKira());
+        dogLayout.addView(angusLayout);
+        dogLayout.addView(kiraLayout);
+
+    }
+
+    @NonNull
+    private LinearLayout createDogLayout(final Dog dog) {
+        ImageView dogImage = new ImageView(this);
+        dogImage.setImageResource(dog.getDrawable());
+        dogImage.setAdjustViewBounds(true);
+        dogImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "You've succesfully selected ".concat(dog.getName()),
+                        Toast.LENGTH_SHORT);
+                toast.show();
+                v.setBackground(getBaseContext().getDrawable(R.drawable.border));
+            }
+        });
+        TextView dogName = new TextView(this);
+        dogName.setText(dog.getName());
+        dogName.setGravity(Gravity.CENTER);
+        LinearLayout dogLayout = new LinearLayout(this);
+        dogLayout.setOrientation(LinearLayout.VERTICAL);
+        dogLayout.addView(dogName);
+        dogLayout.addView(dogImage);
+        dogLayout.setPadding(10, 10, 10, 10);
+        return dogLayout;
     }
 
     @Override

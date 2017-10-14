@@ -1,18 +1,16 @@
 package com.apps.awesome.smartpipican;
 
 
-import android.media.Image;
-
 import java.util.List;
 
-public class Dog {
+class Dog {
 
     private String name;
     private int age;
     private Sex sex;
     private String race;
     private List<String> personality;
-    private Image image;
+    private int drawable;
 
     private enum Sex {
         MALE, FEMALE
@@ -62,11 +60,11 @@ public class Dog {
         this.personality = personality;
     }
 
-    public Image getImage() {
-        return image;
+    public int getDrawable() {
+        return drawable;
     }
 
-    public void setImage(Image image) {
-        this.image = image;
+    public void setDrawable(int drawable) {
+        this.drawable = drawable;
     }
 }
