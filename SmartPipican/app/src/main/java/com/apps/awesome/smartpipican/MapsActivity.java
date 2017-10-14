@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.nfc.NfcAdapter;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -36,10 +37,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        askPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE);
+        boolean location_permission = askPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE);
         askPermission(Manifest.permission.NFC, NFC_REQUEST_CODE);
 
-        if (hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) initMap();
+        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION))
+            initMap();
+
+        NfcAdapter.getDefaultAdapter(this).setNdefPushMessageCallback(new Beamer(), this);
     }
 
     @Override
@@ -66,10 +70,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-    private void askPermission(String permission, int request_code) {
+    private boolean askPermission(String permission, int request_code) {
         if (!hasPermission(permission)) {
             ActivityCompat.requestPermissions(this, new String[]{permission}, request_code);
-        }
+            return false;
+        } else return true;
     }
 
     private boolean hasPermission(String permission) {
