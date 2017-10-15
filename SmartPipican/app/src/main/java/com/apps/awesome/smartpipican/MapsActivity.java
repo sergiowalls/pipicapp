@@ -12,13 +12,11 @@ import android.location.LocationManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
@@ -26,10 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,17 +44,15 @@ import java.util.Set;
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Listener {
 
     public static final String TAG = MapsActivity.class.getSimpleName();
-
     public static final int DEFAULT_ZOOM = 15;
-    private GoogleMap mMap;
+
     private final int LOCATION_REQUEST_CODE = 1;
     private final int NFC_REQUEST_CODE = 2;
 
-    private ActionMenuItemView mBtRead;
+    private Set<String> selectedDogs;
     private NFCReadFragment mNfcReadFragment;
     private boolean isDialogDisplayed = false;
     private NfcAdapter mNfcAdapter;
-    private Toolbar toolbar;
 
 
     @Override
@@ -66,17 +60,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
 
         boolean location_permission = askPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE);
         askPermission(Manifest.permission.NFC, NFC_REQUEST_CODE);
 
-        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
-                initMap();
-
+        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+            initMap();
             initNFC();
-        createDogList();
+            createDogList();
         }
     }
 
@@ -107,7 +100,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         return super.onOptionsItemSelected(item);
     }
 
-    private void initNFC(){
+    private void initNFC() {
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
     }
 
@@ -116,7 +109,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mNfcReadFragment == null) {
             mNfcReadFragment = NFCReadFragment.newInstance();
         }
-        mNfcReadFragment.show(getFragmentManager(),NFCReadFragment.TAG);
+        mNfcReadFragment.show(getFragmentManager(), NFCReadFragment.TAG);
     }
 
     @Override
@@ -130,6 +123,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void createDogList() {
+        selectedDogs = new HashSet<>();
         LinearLayout dogLayout = (LinearLayout) findViewById(R.id.dog_list);
         LinearLayout angusLayout = createDogLayout(DogSeeder.getAngus());
         LinearLayout kiraLayout = createDogLayout(DogSeeder.getKira());
@@ -146,11 +140,20 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         dogImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String message;
+                if (selectedDogs.contains(dog.getName())) {
+                    message = "You've unselected ";
+                    v.setBackground(null);
+                    selectedDogs.remove(dog.getName());
+                } else {
+                    message = "You've succesfully selected ";
+                    v.setBackground(getBaseContext().getDrawable(R.drawable.border));
+                    selectedDogs.add(dog.getName());
+                }
                 Toast toast = Toast.makeText(getApplicationContext(),
-                        "You've succesfully selected ".concat(dog.getName()),
+                        message.concat(dog.getName()),
                         Toast.LENGTH_SHORT);
                 toast.show();
-                v.setBackground(getBaseContext().getDrawable(R.drawable.border));
             }
         });
         dogImage.setOnLongClickListener(new View.OnLongClickListener() {
@@ -200,15 +203,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onNewIntent(Intent intent) {
         Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 
-        Log.d(TAG, "onNewIntent: "+intent.getAction());
+        Log.d(TAG, "onNewIntent: " + intent.getAction());
 
-        if(tag != null) {
+        if (tag != null) {
             Toast.makeText(this, getString(R.string.message_tag_detected), Toast.LENGTH_SHORT).show();
             Ndef ndef = Ndef.get(tag);
 
             if (isDialogDisplayed) {
 
-                mNfcReadFragment = (NFCReadFragment)getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
+                mNfcReadFragment = (NFCReadFragment) getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
                 mNfcReadFragment.onNfcDetected(ndef);
 
             }
@@ -221,11 +224,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
         IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
         IntentFilter techDetected = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
-        IntentFilter[] nfcIntentFilter = new IntentFilter[]{techDetected,tagDetected,ndefDetected};
+        IntentFilter[] nfcIntentFilter = new IntentFilter[]{techDetected, tagDetected, ndefDetected};
 
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-        if(mNfcAdapter!= null)
+        if (mNfcAdapter != null)
             mNfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null);
 
     }
@@ -233,7 +236,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     protected void onPause() {
         super.onPause();
-        if(mNfcAdapter!= null)
+        if (mNfcAdapter != null)
             mNfcAdapter.disableForegroundDispatch(this);
     }
 
@@ -268,7 +271,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onMapReady(GoogleMap googleMap) throws SecurityException {
-        mMap = googleMap;
+        GoogleMap mMap = googleMap;
         mMap.setMyLocationEnabled(true);
 
         mMap.moveCamera(getCameraUpdate(getCurrentLocation(), DEFAULT_ZOOM));
