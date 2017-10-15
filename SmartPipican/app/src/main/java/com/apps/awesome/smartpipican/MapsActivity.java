@@ -87,10 +87,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             initMap();
             initNFC();
             createDogList();
-
-            Intent intent = new Intent(getBaseContext(), PipicanProfileActivity.class);
-            intent.putExtra("PIPICAN_NAME", "PipicanA5");
-            startActivity(intent);
         }
     }
 
@@ -334,7 +330,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     JSONObject jObj = jArr.getJSONObject(0);
                                     String val = jObj.getString("value");
                                     String loc = jObj.getString("location");
-                                    LatLng latLng = new LatLng(Double.valueOf(loc.split(",").toString()), Double.valueOf(loc.split(",", 1).toString()));
+                                    LatLng latLng = new LatLng(Double.valueOf(loc.split(",")[0]), Double.valueOf(loc.split(",")[1]));
                                     pipican.setLatLng(latLng);
                                     pipicanList.add(pipican);
                                     JSONObject jVal = new JSONObject(val);
@@ -350,9 +346,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     pipican.setDogs(new HashSet<>(doglist));
 
                                 }
-                                for (Pipican pipican : pipicanList)
+                                for (Pipican pipican : pipicanList) {
                                     mMap.addMarker(new MarkerOptions().position(pipican.getLatLng()).title(pipican.getTitle())
                                             .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+
+//                                    Intent intent = new Intent(getBaseContext(), PipicanProfileActivity.class);
+//                                    intent.putExtra("PIPICAN_NAME", "PipicanA5");
+//                                    startActivity(intent);
+                                }
 
                             }
 
