@@ -71,6 +71,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             initMap();
             initNFC();
             createDogList();
+
+            Intent intent = new Intent(getBaseContext(), PipicanProfileActivity.class);
+            intent.putExtra("PIPICAN_NAME", "PipicanA5");
+            startActivity(intent);
         }
     }
 
@@ -204,7 +208,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (isDialogDisplayed) {
 
-                mNfcReadFragment = (NFCReadFragment)getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
+                mNfcReadFragment = (NFCReadFragment) getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
                 try {
                     mNfcReadFragment.onNfcDetected(ndef);
                 } catch (ExecutionException e) {

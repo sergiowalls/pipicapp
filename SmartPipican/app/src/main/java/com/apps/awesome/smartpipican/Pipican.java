@@ -11,7 +11,9 @@ class Pipican {
     private String address;
     private Set<Facility> facilities;
 
-    Pipican() {}
+    Pipican() {
+        this.facilities = new HashSet<>();
+    }
 
     Pipican(LatLng latLng, String title) {
         this.latLng = latLng;
@@ -63,7 +65,11 @@ class Pipican {
         this.facilities.add(Facility.AGILITY);
     }
 
-    private enum Facility {
+    public Set<Facility> getFacilities() {
+        return facilities;
+    }
+
+    enum Facility {
         WATER, BAGS, BIG_SIZE, SPECIAL_ZONES, AGILITY
     }
 }

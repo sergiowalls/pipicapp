@@ -43,6 +43,10 @@
             android:name=".DogProfileActivity"
             android:label="@string/title_activity_dog_profile">
         </activity>
+        <activity
+            android:name=".PipicanProfileActivity"
+            android:label="@string/title_activity_pipican_profile">
+        </activity>
     </application>
 
 </manifest>
