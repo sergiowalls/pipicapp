@@ -19,6 +19,7 @@ public class DogProfileActivity extends AppCompatActivity {
     private RadioButton maleView;
     private RadioButton femaleView;
     private EditText raceView;
+    private TextView specialitiesView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,16 @@ public class DogProfileActivity extends AppCompatActivity {
 
                 raceView = (EditText) findViewById(R.id.race);
                 raceView.setText(dog.getRace());
+
+                List<String> personality = dog.getPersonality();
+                String specialities = "";
+                for (String s : personality) {
+                    specialities = specialities.concat(s).concat(", ");
+                }
+                specialities = specialities.substring(0, specialities.length() - 2);
+                specialitiesView = (TextView) findViewById(R.id.specialities);
+                specialitiesView.setText(specialities);
+
             }
         }
 

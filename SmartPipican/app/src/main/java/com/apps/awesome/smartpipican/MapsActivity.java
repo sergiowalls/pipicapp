@@ -52,10 +52,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         boolean location_permission = askPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE);
         askPermission(Manifest.permission.NFC, NFC_REQUEST_CODE);
 
-        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION))
+        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             initMap();
-
-        createDogList();
+            createDogList();
+        }
     }
 
     private void createDogList() {

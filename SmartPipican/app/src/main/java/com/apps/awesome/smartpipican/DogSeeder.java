@@ -12,7 +12,10 @@ public class DogSeeder {
         dog.setAge(3);
         dog.setMale();
         dog.setRace("Mixed Breed");
-        dog.setPersonality(createList("dominant", "energetic", "playful", "child-friendly"));
+        dog.setDominant();
+        dog.setEnergetic();
+        dog.setPlayful();
+        dog.setChildFriendly();
         dog.setDrawable(R.drawable.rex_icon);
         return dog;
     }
@@ -23,7 +26,11 @@ public class DogSeeder {
         dog.setAge(7);
         dog.setMale();
         dog.setRace("Rottweiler");
-        dog.setPersonality(createList("PPP", "dominant", "obedient", "confident", "resolute"));
+        dog.setPPP();
+        dog.setDominant();
+        dog.setObedient();
+        dog.setConfident();
+        dog.setResolute();
         dog.setDrawable(R.drawable.angus_icon);
         return dog;
     }
@@ -34,7 +41,8 @@ public class DogSeeder {
         dog.setAge(1);
         dog.setFemale();
         dog.setRace("Beagle");
-        dog.setPersonality(createList("submissive", "fearful", "untrusting"));
+        dog.setSubmissive();
+        dog.setObedient();
         dog.setDrawable(R.drawable.kira_icon);
         return dog;
     }
