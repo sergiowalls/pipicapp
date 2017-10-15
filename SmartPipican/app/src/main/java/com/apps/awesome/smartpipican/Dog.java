@@ -19,7 +19,7 @@ class Dog {
         MALE, FEMALE
     }
 
-    private enum Personality {
+    enum Personality {
         SUBMISSIVE, FEARFUL, UNTRUSTING, PPP, DOMINANT, OBEDIENT, CONFIDENT, RESOLUTE, ENERGETIC,
         PLAYFUL, CHILDFRIENDLY
     }
