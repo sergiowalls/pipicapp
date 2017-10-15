@@ -41,8 +41,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -346,27 +348,47 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     pipican.setDogs(new HashSet<>(doglist));
 
                                 }
+                                DogCompatibility dogCompatibility = new DogCompatibility();
                                 for (Pipican pipican : pipicanList) {
+                                    boolean compatible = true;
+                                    for (Dog d : pipican.getDogs()) {
+                                        if (d.getName().equals("Kira")) d = DogSeeder.getKira();
+                                        if (d.getName().equals("Angus")) d = DogSeeder.getAngus();
+                                        if (d.getName().equals("Rex")) d = DogSeeder.getRex();
+                                        compatible &= dogCompatibility.isCompatible(DogSeeder.getRex(), d);
+                                    }
+                                    BitmapDescriptor compatibleMarker;
+                                    if (compatible)
+                                        compatibleMarker = BitmapDescriptorFactory.fromResource(R.drawable.marker);
+                                    else
+                                        compatibleMarker = BitmapDescriptorFactory.fromResource(R.drawable.marker_orange);
                                     mMap.addMarker(new MarkerOptions().position(pipican.getLatLng()).title(pipican.getTitle())
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-
-//                                    Intent intent = new Intent(getBaseContext(), PipicanProfileActivity.class);
-//                                    intent.putExtra("PIPICAN_NAME", "PipicanA5");
-//                                    startActivity(intent);
+                                            .icon(compatibleMarker));
                                 }
-
                             }
+                            mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                                @Override
+                                public void onInfoWindowClick(Marker marker) {
+                                    Intent intent = new Intent(getBaseContext(), PipicanProfileActivity.class);
+                                    intent.putExtra("PIPICAN_NAME", marker.getTitle());
+                                    startActivity(intent);
+                                }
+                            });
 
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                }, new Response.ErrorListener() {
+                }, new Response.ErrorListener()
+
+        {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.v(TAG, "Error is: " + error.getMessage());
             }
-        }) {
+        })
+
+        {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();

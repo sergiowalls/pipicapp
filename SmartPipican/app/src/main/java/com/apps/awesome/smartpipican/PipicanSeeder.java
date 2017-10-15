@@ -8,7 +8,7 @@ public class PipicanSeeder {
 
     static Pipican getA5() {
         Pipican pipican = new Pipican();
-        pipican.setTitle("Pipican A5");
+        pipican.setTitle("PipicanA5");
         pipican.setAddress("C/ Jordi Girona 1-3");
         pipican.addAgilityFacility();
         pipican.addWaterFacility();
@@ -18,7 +18,7 @@ public class PipicanSeeder {
 
     static Pipican getEusebiGuell() {
         Pipican pipican = new Pipican();
-        pipican.setTitle("Pipican Eusebi Güell");
+        pipican.setTitle("pipicanEusebiGuell");
         pipican.setAddress("C/ Carrer de Conca, 25X");
         pipican.addBigSizeFacility();
         pipican.addSpecialZonesFacility();
@@ -28,7 +28,7 @@ public class PipicanSeeder {
 
     static Pipican getRoyalPipi() {
         Pipican pipican = new Pipican();
-        pipican.setTitle("Royal Pipi");
+        pipican.setTitle("royalPipi");
         pipican.setAddress("C/ Falsa, 123");
         pipican.addAgilityFacility();
         pipican.addWaterFacility();

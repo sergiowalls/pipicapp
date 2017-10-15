@@ -59,11 +59,11 @@ public class PipicanProfileActivity extends AppCompatActivity {
 
     private int getImage(String title) {
         switch (title) {
-            case "Pipican Eusebi Güell":
+            case "pipicanEusebiGuell":
                 return R.drawable.pipican_eusebi;
-            case "Pipican A5":
+            case "PipicanA5":
                 return R.drawable.pipican_a5;
-            case "Royal Pipi":
+            case "royalPipi":
                 return R.drawable.pipican_royal;
         }
         return 0;
