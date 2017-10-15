@@ -10,15 +10,26 @@ class Pipican {
     private LatLng latLng;
     private String address;
     private Set<Facility> facilities;
+    private Set<Dog> dogs;
+
+    public Set<Dog> getDogs() {
+        return dogs;
+    }
+
+    public void setDogs(Set<Dog> dogs) {
+        this.dogs = dogs;
+    }
 
     Pipican() {
         this.facilities = new HashSet<>();
+        this.dogs = new HashSet<>();
     }
 
     Pipican(LatLng latLng, String title) {
         this.latLng = latLng;
         this.title = title;
         this.facilities = new HashSet<>();
+        this.dogs = new HashSet<>();
     }
 
     public String getTitle() {

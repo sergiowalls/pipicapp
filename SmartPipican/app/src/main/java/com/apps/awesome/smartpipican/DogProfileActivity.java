@@ -26,17 +26,7 @@ public class DogProfileActivity extends AppCompatActivity {
         String dogName = getIntent().getStringExtra("DOG_NAME");
         if (dogName != null) {
             Dog dog = null;
-            switch (dogName) {
-                case "Angus":
-                    dog = DogSeeder.getAngus();
-                    break;
-                case "Kira":
-                    dog = DogSeeder.getKira();
-                    break;
-                case "Rex":
-                    dog = DogSeeder.getRex();
-                    break;
-            }
+            dog = obtainDogFromName(dogName);
             if (dog != null) {
                 nameView = (EditText) findViewById(R.id.name);
                 nameView.setText(dog.getName());
@@ -66,6 +56,18 @@ public class DogProfileActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public static Dog obtainDogFromName(String dogName) {
+        switch (dogName) {
+            case "Angus":
+                return DogSeeder.getAngus();
+            case "Kira":
+                return DogSeeder.getKira();
+            case "Rex":
+                return DogSeeder.getRex();
+        }
+        return null;
     }
 
     public void onSexSelected(View view) {

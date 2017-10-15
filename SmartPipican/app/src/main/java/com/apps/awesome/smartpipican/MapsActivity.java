@@ -29,6 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,9 +45,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -56,6 +69,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private NFCReadFragment mNfcReadFragment;
     private boolean isDialogDisplayed = false;
     private NfcAdapter mNfcAdapter;
+    private GoogleMap mMap;
 
 
     @Override
@@ -270,16 +284,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     @Override
     public void onMapReady(GoogleMap googleMap) throws SecurityException {
-        GoogleMap mMap = googleMap;
+        mMap = googleMap;
         mMap.setMyLocationEnabled(true);
 
         mMap.moveCamera(getCameraUpdate(getCurrentLocation(), DEFAULT_ZOOM));
 
-        Set<Pipican> pipicans = getPipicans();
-        for (Pipican pipican : pipicans)
-            mMap.addMarker(new MarkerOptions().position(pipican.getLatLng()).title(pipican.getTitle())
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
-
+        requestPipicans();
     }
 
     @NonNull
@@ -294,6 +304,76 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         pipicans.add(new Pipican(new LatLng(20, 10), "Pipican 2"));
         pipicans.add(new Pipican(new LatLng(30, 10), "Pipican 3"));
         return pipicans;
+    }
+
+    private void requestPipicans() {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://api.thingtia.cloud/data/pipicans/";
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Display the first 500 characters of the response string.
+                        Log.v(TAG, "Response is: " + response);
+
+                        try {
+                            List<Pipican> pipicanList = new ArrayList<>();
+
+                            JSONObject resp = new JSONObject(response);
+                            JSONArray jsensors = resp.getJSONArray("sensors");
+                            if (jsensors != null) {
+                                int len = jsensors.length();
+                                for (int i = 0; i < len; i++) {
+                                    JSONObject jpipican = jsensors.getJSONObject(i);
+                                    String pipicanName = jpipican.getString("sensor");
+                                    Pipican pipican = PipicanProfileActivity.obtainPipicanFromName(pipicanName);
+
+                                    JSONArray jArr = jpipican.getJSONArray("observations");
+                                    JSONObject jObj = jArr.getJSONObject(0);
+                                    String val = jObj.getString("value");
+                                    String loc = jObj.getString("location");
+                                    LatLng latLng = new LatLng(Double.valueOf(loc.split(",").toString()), Double.valueOf(loc.split(",", 1).toString()));
+                                    pipican.setLatLng(latLng);
+                                    pipicanList.add(pipican);
+                                    JSONObject jVal = new JSONObject(val);
+                                    JSONArray jDogs = jVal.getJSONArray("dogs");
+                                    List<Dog> doglist = new ArrayList<>();
+                                    if (jDogs != null) {
+                                        int len2 = jDogs.length();
+                                        for (int i2 = 0; i2 < len2; i2++) {
+                                            String dogName = jDogs.get(i2).toString();
+                                            doglist.add(DogProfileActivity.obtainDogFromName(dogName));
+                                        }
+                                    }
+                                    pipican.setDogs(new HashSet<>(doglist));
+
+                                }
+                                for (Pipican pipican : pipicanList)
+                                    mMap.addMarker(new MarkerOptions().position(pipican.getLatLng()).title(pipican.getTitle())
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.v(TAG, "Error is: " + error.getMessage());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("IDENTITY_KEY", "b0fbc84c2ecd88589a7cc11f999bb3cafad521c79b79abffb3ab1b480a56d6ef");
+                return params;
+            }
+        };
+        queue.add(stringRequest);
     }
 
     private Location getCurrentLocation() throws SecurityException {

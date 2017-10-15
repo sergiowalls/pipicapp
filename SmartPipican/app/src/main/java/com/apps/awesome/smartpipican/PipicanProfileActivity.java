@@ -19,17 +19,7 @@ public class PipicanProfileActivity extends AppCompatActivity {
         String pipicanName = getIntent().getStringExtra("PIPICAN_NAME");
         if (pipicanName != null) {
             Pipican pipican = null;
-            switch (pipicanName) {
-                case "royalPipi":
-                    pipican = PipicanSeeder.getRoyalPipi();
-                    break;
-                case "PipicanA5":
-                    pipican = PipicanSeeder.getA5();
-                    break;
-                case "pipicanEusebiGuell":
-                    pipican = PipicanSeeder.getEusebiGuell();
-                    break;
-            }
+            pipican = obtainPipicanFromName(pipicanName);
             if (pipican != null) {
                 TextView nameView = (TextView) findViewById(R.id.name);
                 nameView.setText(pipican.getTitle());
@@ -53,6 +43,18 @@ public class PipicanProfileActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    public static Pipican obtainPipicanFromName(String pipicanName) {
+        switch (pipicanName) {
+            case "royalPipi":
+                return PipicanSeeder.getRoyalPipi();
+            case "PipicanA5":
+                return PipicanSeeder.getA5();
+            case "pipicanEusebiGuell":
+                return PipicanSeeder.getEusebiGuell();
+        }
+        return null;
     }
 
     private int getImage(String title) {
