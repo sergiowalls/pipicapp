@@ -38,7 +38,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -50,7 +52,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final int LOCATION_REQUEST_CODE = 1;
     private final int NFC_REQUEST_CODE = 2;
 
-    private Set<String> selectedDogs;
+    private ArrayList<String> selectedDogs;
     private NFCReadFragment mNfcReadFragment;
     private boolean isDialogDisplayed = false;
     private NfcAdapter mNfcAdapter;
@@ -104,7 +106,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void showReadFragment() {
         mNfcReadFragment = (NFCReadFragment) getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
         if (mNfcReadFragment == null) {
-            mNfcReadFragment = NFCReadFragment.newInstance();
+            mNfcReadFragment = NFCReadFragment.newInstance(selectedDogs);
         }
         mNfcReadFragment.show(getFragmentManager(), NFCReadFragment.TAG);
     }
@@ -120,13 +122,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void createDogList() {
-        selectedDogs = new HashSet<>();
+        selectedDogs = new ArrayList<>();
         LinearLayout dogLayout = (LinearLayout) findViewById(R.id.dog_list);
-        LinearLayout angusLayout = createDogLayout(DogSeeder.getAngus());
-        LinearLayout kiraLayout = createDogLayout(DogSeeder.getKira());
-        dogLayout.addView(angusLayout);
-        dogLayout.addView(kiraLayout);
-
+        LinearLayout rexLayout = createDogLayout(DogSeeder.getRex());
+        dogLayout.addView(rexLayout);
     }
 
     @NonNull
@@ -244,9 +243,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initMap() {
-//        setContentView(R.layout.activity_maps);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
