@@ -68,13 +68,15 @@ class Dog {
         this.race = race;
     }
 
-    public List<String> getPersonality() {
+    public List<String> getPersonalities() {
         List<String> s = new ArrayList<>();
         for (Personality p : personality) {
             s.add(p.name().toLowerCase());
         }
         return s;
     }
+
+    public Set<Personality> getPersonality() { return personality;}
 
     public void setSubmissive() {
         personality.add(Personality.SUBMISSIVE);
@@ -99,7 +101,6 @@ class Dog {
     public void removeUntrusting() {
         personality.remove(Personality.UNTRUSTING);
     }
-
 
     public void setPPP() {
         personality.add(Personality.PPP);

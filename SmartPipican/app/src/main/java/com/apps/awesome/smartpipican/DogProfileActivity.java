@@ -3,11 +3,8 @@ package com.apps.awesome.smartpipican;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import java.util.List;
@@ -56,7 +53,7 @@ public class DogProfileActivity extends AppCompatActivity {
                 raceView = (EditText) findViewById(R.id.race);
                 raceView.setText(dog.getRace());
 
-                List<String> personality = dog.getPersonality();
+                List<String> personality = dog.getPersonalities();
                 String specialities = "";
                 for (String s : personality) {
                     specialities = specialities.concat(s).concat(", ");
