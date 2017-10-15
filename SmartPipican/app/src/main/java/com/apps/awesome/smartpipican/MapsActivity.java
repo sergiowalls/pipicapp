@@ -40,6 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Listener {
 
@@ -86,14 +87,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (id == R.id.action_scan) {
             MapsActivity.this.showReadFragment();
-//
-//            mBtRead = (ActionMenuItemView) findViewById(R.id.action_scan);
-//            mBtRead.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    MapsActivity.this.showReadFragment();
-//                }
-//            });
             return true;
         }
 
@@ -211,8 +204,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (isDialogDisplayed) {
 
-                mNfcReadFragment = (NFCReadFragment) getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
-                mNfcReadFragment.onNfcDetected(ndef);
+                mNfcReadFragment = (NFCReadFragment)getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
+                try {
+                    mNfcReadFragment.onNfcDetected(ndef);
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
