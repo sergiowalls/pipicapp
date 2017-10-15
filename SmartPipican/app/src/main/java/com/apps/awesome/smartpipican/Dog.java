@@ -32,8 +32,12 @@ class Dog {
         this.age = age;
     }
 
-    public Sex getSex() {
-        return sex;
+    public boolean isMale() {
+        return sex.equals(Sex.MALE);
+    }
+
+    public boolean isFemale() {
+        return sex.equals(Sex.FEMALE);
     }
 
     public void setMale() {

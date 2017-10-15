@@ -2,6 +2,7 @@ package com.apps.awesome.smartpipican;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -14,6 +15,8 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,6 +34,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static android.R.id.message;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -75,6 +80,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Toast.LENGTH_SHORT);
                 toast.show();
                 v.setBackground(getBaseContext().getDrawable(R.drawable.border));
+            }
+        });
+        dogImage.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Intent intent = new Intent(getBaseContext(), DogProfileActivity.class);
+                ViewGroup parent = (ViewGroup) v.getParent();
+                for (int itemPos = 0; itemPos < parent.getChildCount(); itemPos++) {
+                    View view = parent.getChildAt(itemPos);
+                    if (view instanceof TextView) {
+                        TextView nameView = (TextView) view; //Found it!
+                        intent.putExtra("DOG_NAME", nameView.getText());
+                        break;
+                    }
+                }
+                startActivity(intent);
+                return true;
             }
         });
         TextView dogName = new TextView(this);

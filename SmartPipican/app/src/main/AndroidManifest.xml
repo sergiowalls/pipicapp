@@ -38,6 +38,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DogProfileActivity"
+            android:label="@string/title_activity_dog_profile">
+        </activity>
     </application>
 
 </manifest>

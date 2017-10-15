@@ -5,30 +5,59 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import java.util.List;
 
 public class DogProfileActivity extends AppCompatActivity {
 
-    private AutoCompleteTextView raceView;
+    private EditText nameView;
+    private EditText ageView;
+    private RadioButton maleView;
+    private RadioButton femaleView;
+    private EditText raceView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dog_profile);
 
-        raceView = (AutoCompleteTextView) findViewById(R.id.race);
+        String dogName = getIntent().getStringExtra("DOG_NAME");
+        if (dogName != null) {
+            Dog dog = null;
+            switch (dogName) {
+                case "Angus":
+                    dog = DogSeeder.getAngus();
+                    break;
+                case "Kira":
+                    dog = DogSeeder.getKira();
+                    break;
+                case "Rex":
+                    dog = DogSeeder.getRex();
+                    break;
+            }
+            if (dog != null) {
+                nameView = (EditText) findViewById(R.id.name);
+                nameView.setText(dog.getName());
 
-    }
+                ageView = (EditText) findViewById(R.id.age);
+                ageView.setText(String.valueOf(dog.getAge()));
 
-    private void addItemsToAutocomplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(DogProfileActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
+                maleView = (RadioButton) findViewById(R.id.male);
+                if (dog.isMale()) maleView.toggle();
 
-        raceView.setAdapter(adapter);
+                femaleView = (RadioButton) findViewById(R.id.female);
+                if (dog.isFemale()) femaleView.toggle();
+
+                raceView = (EditText) findViewById(R.id.race);
+                raceView.setText(dog.getRace());
+            }
+        }
+
+
     }
 
     public void onSexSelected(View view) {
@@ -36,7 +65,7 @@ public class DogProfileActivity extends AppCompatActivity {
         boolean checked = ((RadioButton) view).isChecked();
 
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.male:
                 if (checked)
                     // Pirates are the best
