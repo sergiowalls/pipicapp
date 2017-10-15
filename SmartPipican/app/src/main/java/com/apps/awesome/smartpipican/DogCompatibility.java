@@ -116,7 +116,10 @@ public class DogCompatibility {
 
     public boolean isCompatible(Dog dog1, Dog dog2) {
         for (Dog.Personality p : dog1.getPersonality())
-            if (dog2.getPersonality().contains(incompatibilities.get(p))) return false;
+            for(Dog.Personality inc: incompatibilities.get(p))
+                for (Dog.Personality p2 : dog2.getPersonality())
+                    if (inc.name().equals(p2.name()))
+                        return false;
         return true;
     }
 }
