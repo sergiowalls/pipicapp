@@ -1,19 +1,29 @@
 package com.apps.awesome.smartpipican;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.menu.ActionMenuItemView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -35,27 +45,88 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.HashSet;
 import java.util.Set;
 
-import static android.R.id.message;
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, Listener {
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    public static final String TAG = MapsActivity.class.getSimpleName();
 
     public static final int DEFAULT_ZOOM = 15;
     private GoogleMap mMap;
     private final int LOCATION_REQUEST_CODE = 1;
     private final int NFC_REQUEST_CODE = 2;
 
+    private ActionMenuItemView mBtRead;
+    private NFCReadFragment mNfcReadFragment;
+    private boolean isDialogDisplayed = false;
+    private NfcAdapter mNfcAdapter;
+    private Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_maps);
+
+        toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
+        setSupportActionBar(toolbar);
 
         boolean location_permission = askPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_REQUEST_CODE);
         askPermission(Manifest.permission.NFC, NFC_REQUEST_CODE);
 
-        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            initMap();
-            createDogList();
+        if (location_permission && hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
+                initMap();
+
+            initNFC();
+        createDogList();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu_main; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_scan) {
+            MapsActivity.this.showReadFragment();
+//
+//            mBtRead = (ActionMenuItemView) findViewById(R.id.action_scan);
+//            mBtRead.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    MapsActivity.this.showReadFragment();
+//                }
+//            });
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void initNFC(){
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+    }
+
+    private void showReadFragment() {
+        mNfcReadFragment = (NFCReadFragment) getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
+        if (mNfcReadFragment == null) {
+            mNfcReadFragment = NFCReadFragment.newInstance();
+        }
+        mNfcReadFragment.show(getFragmentManager(),NFCReadFragment.TAG);
+    }
+
+    @Override
+    public void onDialogDisplayed() {
+        isDialogDisplayed = true;
+    }
+
+    @Override
+    public void onDialogDismissed() {
+        isDialogDisplayed = false;
     }
 
     private void createDogList() {
@@ -125,8 +196,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+        Log.d(TAG, "onNewIntent: "+intent.getAction());
+
+        if(tag != null) {
+            Toast.makeText(this, getString(R.string.message_tag_detected), Toast.LENGTH_SHORT).show();
+            Ndef ndef = Ndef.get(tag);
+
+            if (isDialogDisplayed) {
+
+                mNfcReadFragment = (NFCReadFragment)getFragmentManager().findFragmentByTag(NFCReadFragment.TAG);
+                mNfcReadFragment.onNfcDetected(ndef);
+
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter tagDetected = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
+        IntentFilter ndefDetected = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        IntentFilter techDetected = new IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED);
+        IntentFilter[] nfcIntentFilter = new IntentFilter[]{techDetected,tagDetected,ndefDetected};
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        if(mNfcAdapter!= null)
+            mNfcAdapter.enableForegroundDispatch(this, pendingIntent, nfcIntentFilter, null);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mNfcAdapter!= null)
+            mNfcAdapter.disableForegroundDispatch(this);
+    }
+
     private void initMap() {
-        setContentView(R.layout.activity_maps);
+//        setContentView(R.layout.activity_maps);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
